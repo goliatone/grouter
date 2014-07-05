@@ -7,10 +7,10 @@
  */
 /* jshint strict: false, plusplus: true */
 /*global define: false, require: false, module: false, exports: false */
-(function (root, name, deps, factory) {
+(function(root, name, deps, factory) {
     "use strict";
     // Node
-     if(typeof deps === 'function') {
+    if (typeof deps === 'function') {
         factory = deps;
         deps = [];
     }
@@ -23,66 +23,57 @@
         define(name.toLowerCase(), deps, factory);
     } else {
         // Browser
-        var d, i = 0, global = root, old = global[name], mod;
-        while((d = deps[i]) !== undefined) deps[i++] = root[d];
+        var d, i = 0,
+            global = root,
+            old = global[name],
+            mod;
+        while ((d = deps[i]) !== undefined) deps[i++] = root[d];
         global[name] = mod = factory.apply(global, deps);
         //Export no 'conflict module', aliases the module.
-        mod.noConflict = function(){
+        mod.noConflict = function() {
             global[name] = old;
             return mod;
         };
     }
-}(this, "GRouter", function() {
+}(this, "GRouter", ['extend'], function(extend) {
 
-    /**
-     * Extend method.
-     * @param  {Object} target Source object
-     * @return {Object}        Resulting object from
-     *                         meging target to params.
+    /*
+     *
      */
-    var _extend= function extend(target) {
-        var sources = [].slice.call(arguments, 1);
-        sources.forEach(function (source) {
-            for (var property in source) {
-                if(source[property] && source[property].constructor &&
-                    source[property].constructor === Object){
-                    target[property] = target[property] || {};
-                    target[property] = extend(target[property], source[property]);
-                } else target[property] = source[property];
-            }
-        });
-        return target;
-    };
+    var _extend = extend;
 
     /**
      * Shim console, make sure that if no console
      * available calls do not generate errors.
      * @return {Object} Console shim.
      */
-    var _shimConsole = function(){
+    var _shimConsole = function(con) {
+
+        if (con) return con;
+
+        con = {};
         var empty = {},
-            con   = {},
-            noop  = function() {},
+            noop = function() {},
             properties = 'memory'.split(','),
             methods = ('assert,clear,count,debug,dir,dirxml,error,exception,group,' +
-                       'groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,' +
-                       'table,time,timeEnd,timeStamp,trace,warn').split(','),
+                'groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,' +
+                'table,time,timeEnd,timeStamp,trace,warn').split(','),
             prop,
             method;
 
-        while (method = methods.pop())    con[method] = noop;
-        while (prop   = properties.pop()) con[prop]   = empty;
+        while (method = methods.pop()) con[method] = noop;
+        while (prop = properties.pop()) con[prop] = empty;
 
         return con;
     };
 
 
-///////////////////////////////////////////////////
-// CONSTRUCTOR
-///////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
+    // CONSTRUCTOR
+    ///////////////////////////////////////////////////
 
-	var options = {
-
+    var options = {
+        initialRoute: 'home'
     };
 
     /**
@@ -90,32 +81,95 @@
      *
      * @param  {object} config Configuration object.
      */
-    var GRouter = function(config){
-        config  = config || {};
+    var GRouter = function(config) {
+        config = config || {};
 
-        config = _extend({}, GRouter.defaults || options, config);
+        config = _extend({}, this.constructor.DEFAULS, config);
 
         this.init(config);
     };
+
+    Router.name = Router.prototype.name = 'Router';
+
+    Router.VERSION = '0.0.0';
 
     /**
      * Make default options available so we
      * can override.
      */
-    GRouter.defaults = options;
+    GRouter.DEFAULS = options;
 
-///////////////////////////////////////////////////
-// PRIVATE METHODS
-///////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
+    // PRIVATE METHODS
+    ///////////////////////////////////////////////////
 
-    GRouter.prototype.init = function(config){
-        if(this.initialized) return this.logger.warn('Already initialized');
+    GRouter.prototype.init = function(config) {
+        if (this.initialized) return;
         this.initialized = true;
 
-        console.log('GRouter: Init!');
+        this.logger.log('Router Initializing', config);
+
+        config = _extend(config, this.constructor.DEFAULS);
         _extend(this, config);
 
-        return 'This is just a stub!';
+        this.currentId = this.currentId || this.initialRoute;
+
+        return this;
+    };
+
+    GRouter.prototype.handler = function(e) {
+        var data = e.data;
+        this.logger.warn('=============\nhandler\n=============', data);
+
+        //Store the current payload.
+        this.event = e;
+        this.data = e.data;
+
+        this.emit('route.' + data.scene, data);
+
+        if (data.payload && data.payload.subscene) {
+            var etype = ['route', data.scene, data.payload.subscene[0]].join('.');
+            this.emit(etype, data);
+        }
+
+        this.emit('route', data);
+    };
+
+    GRouter.prototype.goto = function(id, options) {
+
+        var oldId = this.currentId,
+            isTransitioning = oldId !== id;
+
+        /*
+         * Event type fired before we exit a route.
+         * Default route event is:
+         * exit.home
+         * goto.update or goto.change
+         * goto.<SCENE_ID>.<update | change>
+         */
+        var exitType = isTransitioning ? 'exit.' + oldId : null,
+            actionType = isTransitioning ? 'change' : 'update',
+            actionSceneType = 'goto.' + id + '.' + actionType;
+
+        this.currentId = id;
+
+        [exitType, 'goto', 'goto.' + actionType, actionSceneType].forEach(function(type) {
+            if (!type) return;
+
+            // this.logger.info('EMIT GOTO:', type);
+            this.emit(type, {
+                id: id,
+                old: oldId,
+                isTransitioning: isTransitioning,
+                //TODO: Should we rename options to payload to make it
+                //consistent?!!!
+                options: options
+            });
+        }, this);
+    };
+
+    Router.prototype.emit = function() {
+        this.logger.warn('emit not implemented', arguments);
     };
 
     /**
@@ -123,7 +177,7 @@
      * mixin. As a placeholder, we use console if available
      * or a shim if not present.
      */
-    GRouter.prototype.logger = console || _shimConsole();
+    GRouter.prototype.logger = _shimConsole(console);
 
     return GRouter;
 }));
