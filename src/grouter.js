@@ -84,12 +84,12 @@
     var GRouter = function(config) {
         config = config || {};
 
-        config = _extend({}, this.constructor.DEFAULS, config);
+        config = _extend({}, this.constructor.DEFAULTS, config);
 
         this.init(config);
     };
 
-    GRouter.name = GRouter.prototype.name = 'Router';
+    GRouter.name = GRouter.prototype.name = 'GRouter';
 
     GRouter.VERSION = '0.0.0';
 
@@ -97,7 +97,7 @@
      * Make default options available so we
      * can override.
      */
-    GRouter.DEFAULS = options;
+    GRouter.DEFAULTS = options;
 
     ///////////////////////////////////////////////////
     // PRIVATE METHODS
@@ -107,9 +107,9 @@
         if (this.initialized) return;
         this.initialized = true;
 
-        this.logger.log('Router Initializing', config);
+        this.logger.log('GRouter Initializing', config);
 
-        config = _extend(config, this.constructor.DEFAULS);
+        config = _extend(config, this.constructor.DEFAULTS);
         _extend(this, config);
 
         this.currentId = this.currentId || this.initialRoute;
