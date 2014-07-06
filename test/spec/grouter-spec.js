@@ -1,7 +1,7 @@
-/*global define:true, describe:true , it:true , expect:true, 
+/*global define:true, describe:true , it:true , expect:true,
 beforeEach:true, sinon:true, spyOn:true , expect:true */
 /* jshint strict: false */
-define(['grouter', 'jquery'], function(GRouter, $) {
+define(['grouter'], function(GRouter) {
 
     describe('just checking', function() {
 
@@ -13,11 +13,11 @@ define(['grouter', 'jquery'], function(GRouter, $) {
 
         it('GRouter should initialize', function() {
             var grouter = new GRouter();
-            var output   = grouter.init();
+            var output = grouter.init();
             var expected = 'This is just a stub!';
             expect(output).toEqual(expected);
         });
-        
+
     });
 
 });
