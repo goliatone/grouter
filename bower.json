@@ -1,14 +1,20 @@
 {
-  "name": "grouter",
-  "version": "0.0.0",
-  "main": "./dist/grouter.min.js",
-  "ignore": [
-    "**/.*"
-  ],
-  "dependencies": {
-    "jquery": "~2.0.3",
-    "requirejs": "~2.1.4",
-    "requirejs-text":"2.0.6",
-    "requirejs-domready":"2.0.1"
-  }
+    "name": "grouter",
+    "version": "0.0.0",
+    "main": "./src/grouter.js",
+    "ignore": [
+        "**/.*"
+    ],
+    "dependencies": {
+        "gextend": "latest",
+        "requirejs": "~2.1.4"
+    },
+    "exportsOverride": {
+        "requirejs": {
+            "js": "require.js"
+        },
+        "gextend": {
+            "js": "src/extend.js"
+        }
+    }
 }
