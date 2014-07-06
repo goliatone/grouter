@@ -18,7 +18,7 @@ requirejs.config({
     baseUrl: '/base/src',
 
     paths: {
-
+        'extend': '../lib/gextend/extend',
     },
 
     // ask Require.js to load these files (all our tests)
