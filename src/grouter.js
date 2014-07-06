@@ -89,9 +89,9 @@
         this.init(config);
     };
 
-    Router.name = Router.prototype.name = 'Router';
+    GRouter.name = GRouter.prototype.name = 'Router';
 
-    Router.VERSION = '0.0.0';
+    GRouter.VERSION = '0.0.0';
 
     /**
      * Make default options available so we
@@ -168,7 +168,7 @@
         }, this);
     };
 
-    Router.prototype.emit = function() {
+    GRouter.prototype.emit = function() {
         this.logger.warn('emit not implemented', arguments);
     };
 
