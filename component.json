@@ -1,6 +1,6 @@
 {
   "name": "grouter",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Simple event router",
   "homepage": "https://github.com/goliatone/grouter",
 	"repository": {
