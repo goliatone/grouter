@@ -72,7 +72,7 @@
     // CONSTRUCTOR
     ///////////////////////////////////////////////////
 
-    var options = {
+    var OPTIONS = {
         initialRoute: 'home'
     };
 
@@ -91,13 +91,13 @@
 
     GRouter.name = GRouter.prototype.name = 'GRouter';
 
-    GRouter.VERSION = '0.0.0';
+    GRouter.VERSION = '0.0.1';
 
     /**
      * Make default options available so we
      * can override.
      */
-    GRouter.DEFAULTS = options;
+    GRouter.DEFAULTS = OPTIONS;
 
     ///////////////////////////////////////////////////
     // PRIVATE METHODS
@@ -123,16 +123,16 @@
 
         //Store the current payload.
         this.event = e;
-        this.data = e.data;
+        this.data = data;
 
-        this.emit('route.' + data.scene, data);
+        var subscene = Keypath.get(data, 'payload.subscene', undefined);
+        subscene && (subscene = ['route', data.scene, data.payload.subscene[0]].join('.'));
 
-        if (data.payload && data.payload.subscene) {
-            var etype = ['route', data.scene, data.payload.subscene[0]].join('.');
-            this.emit(etype, data);
-        }
-
-        this.emit('route', data);
+        ['route', 'route.' + data.scene, subscene].forEach(function(type) {
+            if (!type) return;
+            this.logger.info('EMIT ROUTE:', type);
+            this.emit(type, data);
+        }, this);
     };
 
     GRouter.prototype.goto = function(id, options) {
