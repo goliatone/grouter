@@ -35,7 +35,7 @@
             return mod;
         };
     }
-}(this, "GRouter", ['extend'], function(extend) {
+}(this, "grouter", ['extend'], function(extend) {
 
     /*
      *
@@ -73,7 +73,8 @@
     ///////////////////////////////////////////////////
 
     var OPTIONS = {
-        initialRoute: 'home'
+        initialRoute: 'home',
+        autoinitialize:true
     };
 
     /**
@@ -86,7 +87,7 @@
 
         config = _extend({}, this.constructor.DEFAULTS, config);
 
-        this.init(config);
+        if(config.autoinitialize) this.init(config);
     };
 
     GRouter.name = GRouter.prototype.name = 'GRouter';
