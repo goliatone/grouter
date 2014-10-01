@@ -10,5 +10,4 @@ requirejs.config({
 define(['grouter', 'jquery'], function (GRouter, $) {
     console.log('Loading');
 	var grouter = new GRouter();
-	grouter.init();
 });
