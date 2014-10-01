@@ -6,6 +6,7 @@
         "**/.*"
     ],
     "dependencies": {
+        "gpub": "latest",
         "gextend": "latest",
         "requirejs": "~2.1.4"
     },
@@ -15,6 +16,9 @@
         },
         "gextend": {
             "js": "src/extend.js"
+        },
+        "gpub": {
+            "js": "src/gpub.js"
         }
     }
 }
