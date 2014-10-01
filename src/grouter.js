@@ -176,26 +176,44 @@
 
 
     GRouter.prototype.matcher = function(path, payload){
-        var regexp;
-        Object.keys(this.matchers).some(function(matcher){
+        var regexp,
+            matched;
+
+        matched = Object.keys(this.matchers).some(function(matcher){
             regexp = this.matchers[matcher];
+            console.log('MATCH WITH', regexp);
             if(!path.match(regexp)) return false;
             console.log('matching ', matcher, 'for', path);
-            this.emit(path, {payload:payload});
+            this.emit(matcher, {payload:payload});
+            return true;
         }, this);
+
+        if(!matched) this.emit('unhandled', {payload:payload, path:path});
+    };
+
+    var specials = [
+      '/', '.', '*', '+', '?', '|',
+      '(', ')', '[', ']', '{', '}', '\\'
+    ];
+    var escapeRegex = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
+    var makeRegExp = function(path){
+        return path;
+        return path.replace(escapeRegex, '\\$1');
     };
 
     GRouter.prototype.match = function(path, handler){
-        this.matchers[path] = new RegExp(path);
+        this.matchers[path] = makeRegExp(path);
         this.on(path, handler);
     };
+
+
 
     GRouter.prototype.not = function(path, handler){
 
     };
 
-    GRouter.prototype.unhandled = function(path, handler){
-
+    GRouter.prototype.unhandled = function(handler){
+        this.on('unhandled', handler);
     };
 
     /**
