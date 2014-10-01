@@ -177,36 +177,39 @@
 
     GRouter.prototype.matcher = function(path, payload){
         var regexp,
-            matched;
+            matched,
+            keys,
+            values,
+            path = this.sanitizePath(path);
 
         matched = Object.keys(this.matchers).some(function(matcher){
-            regexp = this.matchers[matcher];
+            keys = [];
+            regexp = pathToRegExp(matcher, keys);
             console.log('MATCH WITH', regexp);
-            if(!path.match(regexp)) return false;
+            values = path.match(regexp);
+            if(!values) return false;
             console.log('matching ', matcher, 'for', path);
-            this.emit(matcher, {payload:payload});
+            values.shift();
+            var  params = keys.reduce(function(output, key, i){
+                output[key] = values[i];
+                return output;
+            }, {});
+            this.emit(matcher, {payload:payload, path:path, params:params});
             return true;
         }, this);
 
         if(!matched) this.emit('unhandled', {payload:payload, path:path});
     };
 
-    var specials = [
-      '/', '.', '*', '+', '?', '|',
-      '(', ')', '[', ']', '{', '}', '\\'
-    ];
-    var escapeRegex = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
-    var makeRegExp = function(path){
-        return path;
-        return path.replace(escapeRegex, '\\$1');
+    var makeRegExp = function(path, keys){
+        return pathToRegExp(path, keys);
     };
 
     GRouter.prototype.match = function(path, handler){
+        path = this.sanitizePath(path);
         this.matchers[path] = makeRegExp(path);
         this.on(path, handler);
     };
-
-
 
     GRouter.prototype.not = function(path, handler){
 
@@ -214,6 +217,11 @@
 
     GRouter.prototype.unhandled = function(handler){
         this.on('unhandled', handler);
+    };
+
+    GRouter.prototype.sanitizePath = function(path){
+        if(path.indexOf('/') !== 0) return path;
+        return path.substr(1);
     };
 
     /**
@@ -225,3 +233,28 @@
 
     return GRouter;
 }));
+
+window.pathToRegExp = function (path, keys) {
+    keys || (keys = []);
+    path = path
+        .concat('/?')
+        .replace(/\/\(/g, '(?:/')
+        .replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?|\*/g, function(_, slash, format, key, capture, optional){
+            if (_ === "*"){
+                keys.push(undefined);
+                return _;
+            }
+
+            keys.push(key);
+            slash = slash || '';
+            return ''
+                + (optional ? '' : slash)
+                + '(?:'
+                + (optional ? slash : '')
+                + (format || '') + (capture || '([^/]+?)') + ')'
+                + (optional || '');
+        })
+        .replace(/([\/.])/g, '\\$1')
+        .replace(/\*/g, '(.*)');
+    return new RegExp('^' + path + '$', 'i');
+};
