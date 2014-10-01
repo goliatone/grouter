@@ -20,11 +20,11 @@ define(['grouter', 'gpub'], function (GRouter, GPub) {
 		console.debug('HOME', e);
 	});
 
-	grouter.match('/product/\\d+', function productDetail(e){
-		console.debug('PRODUCT 23', e);
+	grouter.match('/product.:id(\\d+)', function productDetail(e){
+		console.debug('PRODUCT ', e.params.id);
 	});
 
-	grouter.match('/unhandled/example', function productDetail(e){
+	grouter.match('/unhandled.example', function productDetail(e){
 		console.error('THIS SHOULD NOT FIRE', e);
 	});
 
@@ -37,7 +37,7 @@ define(['grouter', 'gpub'], function (GRouter, GPub) {
 	});
 
 	grouter.matcher('/home', {userID:23});
-	grouter.matcher('/product/23', {userID:23});
-	grouter.matcher('/product/566', {userID:23});
-	grouter.matcher('/product/something', {userID:23});
+	grouter.matcher('/product.23', {userID:23});
+	grouter.matcher('/product.566', {userID:23});
+	grouter.matcher('/product.something', {userID:23});
 });
