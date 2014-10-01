@@ -54,5 +54,7 @@ _(Coming soon)_
 ## Examples
 _(Coming soon)_
 
-## Release History
-_(Nothing yet)_
+## TODO:
+- `match(<RegExp>)`
+- `not(<RegExp>)`
+- `on` should take multiple listeners, split by token
