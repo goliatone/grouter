@@ -74,7 +74,8 @@
 
     var OPTIONS = {
         initialRoute: 'home',
-        autoinitialize:true
+        autoinitialize:true,
+        matchers:{}
     };
 
     /**
@@ -171,6 +172,30 @@
 
     GRouter.prototype.emit = function() {
         this.logger.warn('emit not implemented', arguments);
+    };
+
+
+    GRouter.prototype.matcher = function(path, payload){
+        var regexp;
+        Object.keys(this.matchers).some(function(matcher){
+            regexp = this.matchers[matcher];
+            if(!path.match(regexp)) return false;
+            console.log('matching ', matcher, 'for', path);
+            this.emit(path, {payload:payload});
+        }, this);
+    };
+
+    GRouter.prototype.match = function(path, handler){
+        this.matchers[path] = new RegExp(path);
+        this.on(path, handler);
+    };
+
+    GRouter.prototype.not = function(path, handler){
+
+    };
+
+    GRouter.prototype.unhandled = function(path, handler){
+
     };
 
     /**
