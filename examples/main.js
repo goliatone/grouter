@@ -16,28 +16,36 @@ define(['grouter', 'gpub'], function (GRouter, GPub) {
 
 	var grouter = new GRouter();
 
-	grouter.match('/home', function home(e){
+	grouter.match('home', function home(e){
 		console.debug('HOME', e);
 	});
 
-	grouter.match('/product.:id(\\d+)', function productDetail(e){
+	grouter.match('product.:id(\\d+)', function productDetail(e){
 		console.debug('PRODUCT ', e.params.id);
 	});
 
-	grouter.match('/unhandled.example', function productDetail(e){
+	grouter.match('unhandled.example', function productDetail(e){
 		console.error('THIS SHOULD NOT FIRE', e);
 	});
 
-	grouter.not('/home', function notHome(e){
-		console.log('NOT HOME');
+	grouter.match('*', function notHome(e){
+		console.warn('==> UNHANDLED', e.path);
 	});
 
 	grouter.unhandled(function(e){
 		console.info('\nUNHANDLED', e.path);
 	});
 
-	grouter.matcher('/home', {userID:23});
-	grouter.matcher('/product.23', {userID:23});
-	grouter.matcher('/product.566', {userID:23});
-	grouter.matcher('/product.something', {userID:23});
+	grouter.on('all', function(target, e){
+		console.log('HERE ALL IS', e.path, e.params)
+	});
+
+	grouter.not('home', function notHome(e){
+		console.warn('NOT HOME', e.path);
+	});
+
+	grouter.matcher('home', {userID:23});
+	grouter.matcher('product.23', {userID:23});
+	grouter.matcher('product.566', {userID:23});
+	grouter.matcher('product.unhandled', {userID:23});
 });
