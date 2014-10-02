@@ -180,39 +180,43 @@
             matched,
             keys,
             values,
+            params,
+            matcher,
             path = this.sanitizePath(path);
 
-        matched = Object.keys(this.matchers).some(function(matcher){
-            keys = [];
-            regexp = pathToRegExp(matcher, keys);
-            console.log('MATCH WITH', regexp);
+        matched = Object.keys(this.matchers).some(function(m){
+            matcher = m;
+            regexp = this.matchers[matcher];
+            keys = regexp.keys;
             values = path.match(regexp);
             if(!values) return false;
-            console.log('matching ', matcher, 'for', path);
+            console.log('matching ', matcher, 'for', path, 'with', regexp.source);
             values.shift();
-            var  params = keys.reduce(function(output, key, i){
+            params = regexp.keys.reduce(function(output, key, i){
                 output[key] = values[i];
                 return output;
             }, {});
+
             this.emit(matcher, {payload:payload, path:path, params:params});
+
             return true;
         }, this);
 
-        if(!matched) this.emit('unhandled', {payload:payload, path:path});
+        if(!matched || matcher === '*') this.emit('unhandled', {payload:payload, path:path});
     };
 
-    var makeRegExp = function(path, keys){
-        return pathToRegExp(path, keys);
+    var makeRegExp = function(path, keys, options){
+        return pathToRegExp(path, keys, options);
     };
 
     GRouter.prototype.match = function(path, handler){
         path = this.sanitizePath(path);
-        this.matchers[path] = makeRegExp(path);
+        this.matchers[path] = makeRegExp(path, []);
         this.on(path, handler);
     };
 
     GRouter.prototype.not = function(path, handler){
-
+        this.match(path, handler, {negated:true});
     };
 
     GRouter.prototype.unhandled = function(handler){
@@ -234,8 +238,10 @@
     return GRouter;
 }));
 
-window.pathToRegExp = function (path, keys) {
+window.pathToRegExp = function (path, keys, options) {
+    // https://github.com/aaronblohowiak/routes.js
     keys || (keys = []);
+    options || (options = {});
     path = path
         .concat('/?')
         .replace(/\/\(/g, '(?:/')
@@ -256,5 +262,11 @@ window.pathToRegExp = function (path, keys) {
         })
         .replace(/([\/.])/g, '\\$1')
         .replace(/\*/g, '(.*)');
-    return new RegExp('^' + path + '$', 'i');
+
+    var regexp = new RegExp('^' + path + '$', 'i');
+
+    regexp.keys = keys;
+    regexp.options = options;
+
+    return regexp;
 };
