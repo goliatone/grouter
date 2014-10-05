@@ -1,24 +1,28 @@
 {
-    "name": "grouter",
-    "version": "0.0.1",
-    "main": "./src/grouter.js",
-    "ignore": [
-        "**/.*"
-    ],
-    "dependencies": {
-        "gpub": "latest",
-        "gextend": "latest",
-        "requirejs": "~2.1.4"
+  "name": "grouter",
+  "version": "0.0.1",
+  "main": "./src/grouter.js",
+  "ignore": [
+    "**/.*"
+  ],
+  "dependencies": {
+    "gpub": "latest",
+    "gextend": "latest",
+    "requirejs": "~2.1.4",
+    "pathtoregexp": "~1.0.2"
+  },
+  "exportsOverride": {
+    "requirejs": {
+      "js": "require.js"
     },
-    "exportsOverride": {
-        "requirejs": {
-            "js": "require.js"
-        },
-        "gextend": {
-            "js": "src/extend.js"
-        },
-        "gpub": {
-            "js": "src/gpub.js"
-        }
+    "gextend": {
+      "js": "src/extend.js"
+    },
+    "gpub": {
+      "js": "src/gpub.js"
+    },
+    "pathtoregexp": {
+      "js": "pathtoregexp.js"
     }
+  }
 }
