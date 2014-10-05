@@ -50,10 +50,11 @@ define(['grouter', 'gpub', 'pathtoregexp'], function (GRouter, GPub, pathtoregex
 
 	grouter.on('route', function(e){
 		this.match(e.scene);
+		this.goto(e.scene);
 	});
 
 	grouter.handler({data:{scene:'president_veto'}});
-	grouter.handler({data:{scene:'president_veto_override_vote_start'}});
+	grouter.handler({data:{scene:'president_veto_override_vote_start', payload:{subscene:['peperone']}}});
 
 	grouter.match('home');
 	grouter.match('product/23', {userID:23});
