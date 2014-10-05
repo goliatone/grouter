@@ -9,7 +9,8 @@
     "gpub": "latest",
     "gextend": "latest",
     "requirejs": "~2.1.4",
-    "pathtoregexp": "~1.0.2"
+    "pathtoregexp": "~1.0.2",
+    "gkeypath": "~0.1.7"
   },
   "exportsOverride": {
     "requirejs": {
@@ -19,7 +20,10 @@
       "js": "src/extend.js"
     },
     "gpub": {
-      "js": "src/gpub.js"
+      "js": "src/*.js"
+    },
+    "gkeypath": {
+      "js": "src/*.js"
     },
     "pathtoregexp": {
       "js": "pathtoregexp.js"
