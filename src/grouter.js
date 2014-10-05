@@ -178,7 +178,6 @@
     GRouter.prototype.matcher = function(path, payload){
         var regexp,
             matched,
-            keys,
             values,
             params,
             matcher,
@@ -187,13 +186,12 @@
         matched = Object.keys(this.matchers).some(function(m){
             matcher = m;
             regexp = this.matchers[matcher];
-            keys = regexp.keys;
             values = path.match(regexp);
             if(!values) return false;
-            console.log('matching ', matcher, 'for', path, 'with', regexp.source);
+            console.log('matching ', matcher, 'for', path, 'with', regexp);
             values.shift();
             params = regexp.keys.reduce(function(output, key, i){
-                output[key] = values[i];
+                output[key.name] = values[i];
                 return output;
             }, {});
 
@@ -202,21 +200,13 @@
             return true;
         }, this);
 
-        if(!matched || matcher === '*') this.emit('unhandled', {payload:payload, path:path});
-    };
-
-    var makeRegExp = function(path, keys, options){
-        return pathToRegExp(path, keys, options);
+        if(!matched && matcher !== '*') this.emit('unhandled', {payload:payload, path:path});
     };
 
     GRouter.prototype.match = function(path, handler){
         path = this.sanitizePath(path);
-        this.matchers[path] = makeRegExp(path, []);
+        this.matchers[path] = this.pathToRegexp(path, []);
         this.on(path, handler);
-    };
-
-    GRouter.prototype.not = function(path, handler){
-        this.match(path, handler, {negated:true});
     };
 
     GRouter.prototype.unhandled = function(handler){
@@ -224,6 +214,7 @@
     };
 
     GRouter.prototype.sanitizePath = function(path){
+        if(path instanceof RegExp) return path;
         if(path.indexOf('/') !== 0) return path;
         return path.substr(1);
     };
@@ -237,36 +228,3 @@
 
     return GRouter;
 }));
-
-window.pathToRegExp = function (path, keys, options) {
-    // https://github.com/aaronblohowiak/routes.js
-    keys || (keys = []);
-    options || (options = {});
-    path = path
-        .concat('/?')
-        .replace(/\/\(/g, '(?:/')
-        .replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?|\*/g, function(_, slash, format, key, capture, optional){
-            if (_ === "*"){
-                keys.push(undefined);
-                return _;
-            }
-
-            keys.push(key);
-            slash = slash || '';
-            return ''
-                + (optional ? '' : slash)
-                + '(?:'
-                + (optional ? slash : '')
-                + (format || '') + (capture || '([^/]+?)') + ')'
-                + (optional || '');
-        })
-        .replace(/([\/.])/g, '\\$1')
-        .replace(/\*/g, '(.*)');
-
-    var regexp = new RegExp('^' + path + '$', 'i');
-
-    regexp.keys = keys;
-    regexp.options = options;
-
-    return regexp;
-};
