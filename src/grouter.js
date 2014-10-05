@@ -128,7 +128,7 @@
         this.data = data;
 
         var subscene = Keypath.get(data, 'payload.subscene', undefined);
-        subscene && (subscene = ['route', data.scene, data.payload.subscene[0]].join('.'));
+        subscene && (subscene = ['route', data.scene, subscene[0]].join('.'));
 
         ['route', 'route.' + data.scene, subscene].forEach(function(type) {
             if (!type) return;
@@ -158,7 +158,7 @@
         [exitType, 'goto', 'goto.' + actionType, actionSceneType].forEach(function(type) {
             if (!type) return;
 
-            // this.logger.info('EMIT GOTO:', type);
+            this.logger.info('EMIT GOTO:', type);
             this.emit(type, {
                 id: id,
                 old: oldId,
