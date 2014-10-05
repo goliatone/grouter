@@ -4,6 +4,7 @@ requirejs.config({
     paths: {
         'grouter': 'grouter',
         'gpub':'gpub/gpub',
+        'keypath':'gkeypath/keypath',
         'pathtoregexp':'pathtoregexp/pathtoregexp',
         'extend':'gextend/extend'
     }
@@ -38,7 +39,7 @@ define(['grouter', 'gpub', 'pathtoregexp'], function (GRouter, GPub, pathtoregex
 		// console.log('HERE ALL IS', e.path, e.params);
 	});
 
-	grouter.route(/route\/president_(.*)/, function(e) {
+	grouter.route(/^president_(.*)$/, function(e) {
 		console.log('\n=========================');
         console.warn('MATCHING ANY ROUTE', e.path);
     });
@@ -47,13 +48,19 @@ define(['grouter', 'gpub', 'pathtoregexp'], function (GRouter, GPub, pathtoregex
 		console.info('===> UNHANDLED', e.path);
 	});
 
+	grouter.on('route', function(e){
+		this.match(e.scene);
+	});
+
+	grouter.handler({data:{scene:'president_veto'}});
+	grouter.handler({data:{scene:'president_veto_override_vote_start'}});
+
 	grouter.match('home');
 	grouter.match('product/23', {userID:23});
 	grouter.match('product/566', {userID:23});
 	grouter.match('product/unhandled');
-	grouter.match('route/president_bill_sign');
-	grouter.match('route/president_veto');
-	grouter.match('route/president_veto_override_vote_start');
+	grouter.match('president_bill_sign');
+
 
 	window.rt = grouter;
 });
