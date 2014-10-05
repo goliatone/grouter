@@ -175,7 +175,7 @@
     };
 
 
-    GRouter.prototype.matcher = function(path, payload){
+    GRouter.prototype.match = function(path, payload){
         var regexp,
             matched,
             values,
@@ -188,7 +188,6 @@
             regexp = this.matchers[matcher];
             values = path.match(regexp);
             if(!values) return false;
-            console.log('matching ', matcher, 'for', path, 'with', regexp);
             values.shift();
             params = regexp.keys.reduce(function(output, key, i){
                 output[key.name] = values[i];
@@ -203,7 +202,7 @@
         if(!matched && matcher !== '*') this.emit('unhandled', {payload:payload, path:path});
     };
 
-    GRouter.prototype.match = function(path, handler){
+    GRouter.prototype.route = function(path, handler){
         path = this.sanitizePath(path);
         this.matchers[path] = this.pathToRegexp(path, []);
         this.on(path, handler);
