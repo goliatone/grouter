@@ -35,7 +35,7 @@
             return mod;
         };
     }
-}(this, "grouter", ['extend'], function(extend) {
+}(this, "grouter", ['extend', 'keypath'], function(extend, Keypath) {
 
     /*
      *
