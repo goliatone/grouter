@@ -93,11 +93,11 @@
 
     GRouter.name = GRouter.prototype.name = 'GRouter';
 
-    GRouter.VERSION = '0.0.1';
+    GRouter.VERSION = '0.0.2';
 
     /**
      * Make default options available so we
-     * can override.
+     * can override
      */
     GRouter.DEFAULTS = OPTIONS;
 
