@@ -127,6 +127,7 @@
         this.event = e;
         this.data = data;
 
+        //TODO: Remove this chunk, provide a generateTypes method
         var subscene = Keypath.get(data, 'payload.subscene', undefined);
         subscene && (subscene = ['route', data.scene, subscene[0]].join('.'));
 
