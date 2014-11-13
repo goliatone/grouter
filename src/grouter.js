@@ -35,7 +35,7 @@
             return mod;
         };
     }
-}(this, "grouter", ['extend', 'keypath'], function(extend, Keypath) {
+}(this, "GRouter", ['extend', 'keypath'], function(extend, Keypath) {
 
     /*
      *
@@ -93,7 +93,7 @@
 
     GRouter.name = GRouter.prototype.name = 'GRouter';
 
-    GRouter.VERSION = '0.0.2';
+    GRouter.VERSION = '0.0.3';
 
     /**
      * Make default options available so we
@@ -122,6 +122,10 @@
     GRouter.prototype.handler = function(e) {
         var data = e.data;
         this.logger.warn('=============\nhandler\n=============', data);
+
+        if(data.type === 'command'){
+            return this.emit('command.' + data.name, data.payload);
+        }
 
         //Store the current payload.
         this.event = e;
